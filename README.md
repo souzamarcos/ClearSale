@@ -15,6 +15,10 @@ API de integração com a ClearSale.
 A Clearsale é uma empresa brasileira para gestão de risco de fraude que atua no mundo físico e virtual, com soluções
 para e-commerce, crédito, cobrança e recuperação de vendas.
 
+## O que é a solução Ticket da ClearSale?
+
+É uma solução antifraude desenvolvida para vendas de ingresso online.
+
 ## Requisitos
 
 PHP 5.3+
@@ -61,20 +65,30 @@ O trecho de código abaixo é um exemplo básico de como realizar a solicitaçã
 ```PHP
 
 try {
-    $order = new \ClearSale\Order();
-    $order->setFingerPrint($fingerPrint)
-        ->setId($orderId)
-        ->setDate($date)
-        ->setEmail($email)
-        ->setTotalItems($totalItems)
-        ->setTotalOrder($orderTotal)
-        ->setQuantityInstallments($quantityInstallments);
-        ->setIp($ip);
-        ->setOrigin($origin);
-        ->setBillingData($customer)
-        ->setShippingData($customer)
-        ->setItems($items)
-        ->setPayments($payments);
+
+    // Criar Pedido
+    $order = \ClearSale\Order::createEcommerceOrder(
+        $fingerPrint,
+        $orderId,
+        $date,
+        $email,
+        $totalItems,
+        $totalOrder,
+        $ip,
+        $origin,
+        $product,
+        $customerBillingData,
+        $customerShippingData,
+        $payment,
+        $tickets
+    )
+    ->setFingerPrint($fingerPrint)
+    ->setShippingPrice($shippingPrice)
+    ->setQuantityItems($quantityItems)
+    ->setQuantityPaymentTypes($quantityPaymentTypes)
+    ->setShippingType($shippingType)
+    ->setStatus($status)
+    ->setCountry($country);
 
     // Definir ambiente
     $environment = new \ClearSale\Environment\Sandbox('<CLEARSALE_ENTITY_CODE>');
@@ -83,19 +97,31 @@ try {
     $clearSale = new \ClearSale\ClearSaleAnalysis($environment);
     $response = $clearSale->analysis($order);
 
+    // Salvar informações do pedido retornado após análise
+    $packageStatus = $clearSale->getPackageStatus();
+
     // Resultado da análise
     switch ($response)
     {
         case \ClearSale\ClearSaleAnalysis::APROVADO:
             // Análise aprovou a cobrança, realizar o pagamento
+            var_dump($packageStatus);
             break;
+
         case \ClearSale\ClearSaleAnalysis::REPROVADO:
             // Análise não aprovou a cobrança
+            var_dump($packageStatus);
             break;
+
         case \ClearSale\ClearSaleAnalysis::AGUARDANDO_APROVACAO:
             // Análise pendente de aprovação manual
+            var_dump($packageStatus);
+            break;
+
+        default:
             break;
     }
+
 } catch (\Exception $e) {
     // Erro genérico da análise
 }
@@ -117,12 +143,10 @@ $clearSale->updateOrderStatusId($orderId, \ClearSale\ClearSaleAnalysis::REPROVAD
 
 ## Documentação
 
-Você pode encontrar a documentação de integração da ClearSale no diretório [docs](docs).
+Você pode encontrar a documentação de integração da ClearSale Ticket no diretório [docs](docs).
 
 ## Exemplos
 
-Você pode encontrar alguns exemplos prontos para uso no diretório [examples](examples).
+Você pode encontrar o exemplo pronto para uso no diretório [examples](examples).
 
-* [Exemplo de pedido de E-Commerce](examples/ecommerce-order-example.php)
-
-* [Exemplo de pedido de Passagem Aérea](examples/airline-ticket-order-example.php)
+* [Exemplo de pedido de Ticket](examples/ticket-example.php)
