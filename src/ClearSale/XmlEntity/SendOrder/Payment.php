@@ -11,20 +11,23 @@ use XMLWriter;
 
 class Payment implements XmlEntityInterface
 {
-    const CARTAO_CREDITO           = 1;
-    const BOLETO_BANCARIO          = 2;
-    const DEBITO_BANCARIO          = 3;
-    const DEBITO_BANCARIO_DINHEIRO = 4;
-    const DEBITO_BANCARIO_CHEQUE   = 5;
-    const TRANSFERENCIA_BANCARIA   = 6;
-    const SEDEX_A_COBRAR           = 7;
-    const CHEQUE                   = 8;
-    const DINHEIRO                 = 9;
-    const FINANCIAMENTO            = 10;
-    const FATURA                   = 11;
-    const CUPOM                    = 12;
-    const MULTICHEQUE              = 13;
-    const OUTROS                   = 14;
+    const CARTAO_CREDITO           = 1;  //Cartão de Crédito
+    const BOLETO_BANCARIO          = 2;  //Boleto Bancário
+    const DEBITO_BANCARIO          = 3;  //Débito bancário
+    const DEBITO_BANCARIO_DINHEIRO = 4;  //Débito Bancário – Dinheiro
+    const DEBITO_BANCARIO_CHEQUE   = 5;  //Débito Bancário – Cheque
+    const TRANSFERENCIA_BANCARIA   = 6;  //Transferência Bancária
+    const SEDEX_A_COBRAR           = 7;  //Sedex a Cobrar
+    const CHEQUE                   = 8;  //Cheque
+    const DINHEIRO                 = 9;  //Dinheiro
+    const FINANCIAMENTO            = 10; //Financiamento
+    const FATURA                   = 11; //Fatura
+    const CUPOM                    = 12; //Cupom
+    const MULTICHEQUE              = 13; //Multicheque
+    const OUTROS                   = 14; //Outros
+    const VALE                     = 16; //Vale
+    const DEBITO_PARCELADO         = 17; //Débito Parcelado
+    const VALE_DESCONTO            = 18; //Vale Desconto
 
     private static $paymentTypes = array(
         self::CARTAO_CREDITO,
@@ -41,16 +44,44 @@ class Payment implements XmlEntityInterface
         self::CUPOM,
         self::MULTICHEQUE,
         self::OUTROS,
+        self::VALE,
+        self::DEBITO_PARCELADO,
+        self::VALE_DESCONTO
     );
 
-    private $type;
+    const BANDEIRA_DINERS           = 1;
+    const BANDEIRA_MASTERCARD       = 2;
+    const BANDEIRA_VISA             = 3;
+    const BANDEIRA_OUTROS           = 4;
+    const BANDEIRA_AMERICAN_EXPRESS = 5;
+    const BANDEIRA_HIPERCARD        = 6;
+    const BANDEIRA_AURA             = 7;
+
+    private static $cards = array(
+        self::BANDEIRA_DINERS,
+        self::BANDEIRA_MASTERCARD,
+        self::BANDEIRA_VISA,
+        self::BANDEIRA_OUTROS,
+        self::BANDEIRA_AMERICAN_EXPRESS,
+        self::BANDEIRA_HIPERCARD,
+        self::BANDEIRA_AURA,
+    );
+
     private $sequential;
     private $date;
     private $amount;
+    private $type;
     private $qtyInstallments;
     private $interest;
     private $interestValue;
-    private $card;
+   
+    private $cardNumber;
+    private $cardBin;
+    private $cardEndNumber;
+    private $cardType;
+    private $cardExpirationDate;
+
+    private $name;
     private $legalDocument;
     private $address;
     private $nsu;
@@ -66,22 +97,6 @@ class Payment implements XmlEntityInterface
             ->setAmount($amount);
 
         return $instance;
-    }
-
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    public function setType($type)
-    {
-        if (!array_key_exists($type, self::$paymentTypes)) {
-            throw new InvalidArgumentException(sprintf('Invalid payment type (%s)', $type));
-        }
-
-        $this->type = $type;
-
-        return $this;
     }
 
     public function getSequential()
@@ -129,6 +144,22 @@ class Payment implements XmlEntityInterface
         return $this;
     }
 
+        public function getType()
+    {
+        return $this->type;
+    }
+
+    public function setType($type)
+    {
+        if (!array_key_exists($type, self::$paymentTypes)) {
+            throw new InvalidArgumentException(sprintf('Invalid payment type (%s)', $type));
+        }
+
+        $this->type = $type;
+
+        return $this;
+    }
+
     public function getQtyInstallments()
     {
         return $this->qtyInstallments;
@@ -165,23 +196,74 @@ class Payment implements XmlEntityInterface
         return $this;
     }
 
-    /**
-     *
-     * @return Card
-     */
-    public function getCard()
+    public function getCardNumber()
     {
-        return $this->card;
+        return $this->cardNumber;
     }
 
-    /**
-     *
-     * @param Card $card
-     * @return Payment
-     */
-    public function setCard(Card $card)
+    public function setCardNumber($cardNumber)
     {
-        $this->card = $card;
+        $this->cardNumber = $cardNumber;
+
+        return $this;
+    }
+
+    public function getCardBin()
+    {
+        return $this->cardBin;
+    }
+
+    public function setCardBin($cardBin)
+    {
+        $this->cardBin = $cardBin;
+
+        return $this;
+    }
+
+    public function getCardEndNumber()
+    {
+        return $this->cardEndNumber;
+    }
+
+    public function setCardEndNumber($cardEndNumber)
+    {
+        $this->cardEndNumber = $cardEndNumber;
+
+        return $this;
+    }
+
+    public function getCardType()
+    {
+        return $this->cardType;
+    }
+
+    public function setCardType($cardType)
+    {
+        $this->cardType = $cardType;
+
+        return $this;
+    }
+
+    public function getCardExpirationDate()
+    {
+        return $this->cardExpirationDate;
+    }
+
+    public function setCardExpirationDate($cardExpirationDate)
+    {
+        $this->cardExpirationDate = $cardExpirationDate;
+
+        return $this;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
 
         return $this;
     }
@@ -198,22 +280,6 @@ class Payment implements XmlEntityInterface
         return $this;
     }
 
-    /**
-     *
-     * @return Address
-     */
-    public function getAddress()
-    {
-        return $this->address;
-    }
-
-    public function setAddress(Address $address)
-    {
-        $this->address = $address;
-
-        return $this;
-    }
-
     public function getNsu()
     {
         return $this->nsu;
@@ -222,18 +288,6 @@ class Payment implements XmlEntityInterface
     public function setNsu($nsu)
     {
         $this->nsu = $nsu;
-
-        return $this;
-    }
-
-    public function getCurrency()
-    {
-        return $this->currency;
-    }
-
-    public function setCurrency(Currency $currency)
-    {
-        $this->currency = $currency->toValue();
 
         return $this;
     }
@@ -276,8 +330,28 @@ class Payment implements XmlEntityInterface
             $xml->writeElement("InterestValue", $this->interestValue);
         }
 
-        if ($this->card) {
-            $this->card->toXML($xml);
+        if ($this->cardNumber) {
+            $xml->writeElement("CardNumber", $this->cardNumber);
+        }
+
+        if ($this->cardBin) {
+            $xml->writeElement("CardBin", $this->cardBin);
+        }
+
+        if ($this->cardEndNumber) {
+            $xml->writeElement("CardEndNumber", $this->cardEndNumber);
+        }
+
+        if ($this->cardType) {
+            $xml->writeElement("CardType", $this->cardType);
+        }
+
+        if ($this->cardExpirationDate) {
+            $xml->writeElement("CardExpirationDate", $this->cardExpirationDate);
+        }
+
+        if ($this->name) {
+            $xml->writeElement("Name", $this->name);
         }
 
         if ($this->legalDocument) {

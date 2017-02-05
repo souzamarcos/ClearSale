@@ -9,13 +9,12 @@ use XMLWriter;
 
 class Phone implements XmlEntityInterface
 {
-    const NAO_DEFINIDO = 0;
-    const RESIDENCIAL  = 1;
-    const COMERCIAL    = 2;
-    const RECADOS      = 3;
-    const COBRANCA     = 4;
-    const TEMPORARIO   = 5;
-    const CELULAR      = 6;
+    const NAO_DEFINIDO = 0; //Não Definido
+    const RESIDENCIAL  = 1; //Residencial
+    const COMERCIAL    = 2; //Comercial
+    const RECADOS      = 3; //Recados
+    const COBRANCA     = 4; //Cobrança
+    const CELULAR      = 6; //Celular
 
     private static $types = array(
         self::NAO_DEFINIDO,
@@ -23,9 +22,9 @@ class Phone implements XmlEntityInterface
         self::COMERCIAL,
         self::RECADOS,
         self::COBRANCA,
-        self::TEMPORARIO,
         self::CELULAR,
     );
+
     private $ddi;
     private $ddd;
     private $number;
@@ -70,7 +69,7 @@ class Phone implements XmlEntityInterface
     {
         $ddd = preg_replace('/[^0-9]/', '', $ddd);
 
-        if (strlen($ddd) != 2) {
+        if (strlen($ddd) > 2) {
             throw new InvalidArgumentException(sprintf('Invalid DDD', $ddd));
         }
 
@@ -139,7 +138,7 @@ class Phone implements XmlEntityInterface
             $xml->writeElement("DDI", $this->ddi);
         }
 
-        if ($this->ddd) {
+        if ($this->ddd||$this->ddd==="0") {
             $xml->writeElement("DDD", $this->ddd);
         } else {
             throw new RequiredFieldException('Field DDD of the Phone object is required');

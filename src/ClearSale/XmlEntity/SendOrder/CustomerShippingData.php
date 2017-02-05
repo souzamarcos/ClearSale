@@ -19,7 +19,7 @@ class CustomerShippingData extends AbstractCustomer
      * @param Phone $phone
      * @return Customer
      */
-    public static function create($id, $type, $legalDocument, $name, Address $address, $phone)
+    public static function create($id, $type, $legalDocument, $name, Address $address, $phone, DateTime $birthDate)
     {
         $instance = new self();
 
@@ -29,6 +29,7 @@ class CustomerShippingData extends AbstractCustomer
         $instance->setName($name);
         $instance->setAddress($address);
         $instance->addPhone($phone);
+        $instance->setBirthDate($birthDate);
 
         return $instance;
     }

@@ -10,6 +10,8 @@ use XMLWriter;
 
 class CustomerBillingData extends AbstractCustomer
 {
+    private $motherName;
+
     /**
      * @param string $id
      * @param string $type
@@ -33,6 +35,18 @@ class CustomerBillingData extends AbstractCustomer
         $instance->setBirthDate($birthDate);
 
         return $instance;
+    }
+
+    public function getMotherName()
+    {
+        return $this->motherName;
+    }
+
+    public function setMotherName($motherName)
+    {
+        $this->motherName = $motherName;
+
+        return $this;
     }
 
     public function toXML(XMLWriter $xml)

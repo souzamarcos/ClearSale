@@ -30,6 +30,7 @@ class PackageStatus
 
     public function __construct($xml)
     {
+        $xml;
         // FIX PHP Warning: Parser error : Document labelled UTF-16 but has UTF-8 content
         $xml = preg_replace('/(<\?xml[^?]+?)utf-16/i', '$1utf-8', $xml);
 
@@ -53,6 +54,9 @@ class PackageStatus
                 $object->Orders->Order->Status,
                 $object->Orders->Order->Score
             );
+            if(isset($object->Orders->Order->QuizUrl)){
+                $this->order->setQuizUrl($object->Orders->Order->QuizUrl);
+            }
         }
     }
 
@@ -108,7 +112,7 @@ class PackageStatus
         }
 
         $exceptionClass = static::$statusCodeExceptions[$this->getStatusCode()];
-
+        
         throw new $exceptionClass($this->getMessage(), $this->getStatusCode());
     }
 }

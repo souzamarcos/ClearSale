@@ -24,12 +24,26 @@ class OrderReturn
     const STATUS_SAIDA_FRAUDE_CONFIRMADA       = 'FRD';
     /* Pedido Reprovado Automaticamente por algum tipo de Regra de Negócio que necessite aplicá-la (Obs: não usual e não recomendado). */
     const STATUS_SAIDA_REPROVACAO_AUTOMATICA   = 'RPA';
+
+    /*Pedido não foi aprovado automaticamente e o comprador deve preencher um questionário de autovalidação de identididade.*/
+    const STATUS_SAIDA_PENDENTE_AUTOVALIDACAO  = 'PAV';
+
+    /*Pedido aprovado pelo questionário de autovalidação. Indica que o Quiz foi respondido corretamente pelo comprador. Utilizado para os produtos “Tickets Online com Gestão CS” e “Tickets Online sem Gestão CS”, quando o pedido utilizar o Quiz de autovalidação*/
+    const STATUS_SAIDA_APROVADO_QUESTIONARIO   = 'APQ';
+
+    /*Pedido reprovado pelo questionário de autovalidação. Indica que o Quiz foi respondido incorretamente pelo comprador. Utilizado para os produtos “Tickets Online com Gestão CS” e “Tickets Online sem Gestão CS”, quando o pedido utilizar o Quiz de autovalidação.*/
+    const STATUS_SAIDA_REPROVADO_QUESTIONARIO  = 'RPQ';
+
+    /*Pedido reprovado quando não existem dados suficientes para gerar o Quiz no momento em que o comprador acessar o questionário.*/
+    const STATUS_SAIDA_QUESTIONARIO_NAO_GERADO = 'QNG';
+
     /* Pedido reprovado automaticamente por política estabelecida pelo cliente ou ClearSale. */
     const STATUS_SAIDA_REPROVACAO_POR_POLITICA = 'RPP';
 
     private $id;
     private $status;
     private $score;
+    private $quizUrl;
 
     public function __construct($id, $status, $score)
     {
@@ -51,5 +65,13 @@ class OrderReturn
     public function getScore()
     {
         return $this->score;
+    }
+    public function setQuizUrl($quizUrl)
+    {
+        $this->quizUrl = $quizUrl;
+    }
+    public function getQuizUrl()
+    {
+        return $this->quizUrl;
     }
 }

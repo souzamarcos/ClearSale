@@ -10,116 +10,106 @@ use XMLWriter;
 class Order
 {
     const DATE_TIME_FORMAT = 'Y-m-d\TH:i:s';
-    const ECOMMERCE_B2B = 'b2b';
-    const ECOMMERCE_B2C = 'b2c';
 
-    private static $ecommerceTypes = array(
-        self::ECOMMERCE_B2B,
-        self::ECOMMERCE_B2C,
+    const ENTREGA_OUTROS = 0; //Outros
+    const ENTREGA_NORMAL = 1; //Entrega Normal
+    const ENTREGA_GARANTIDA = 2; //Entrega Garantida
+    const ENTREGA_EXPRESSA_BRASIL = 3; //Entrega Expressa no Brasil
+    const ENTREGA_EXPRESSA_SAO_PAULO = 4; //Entrega Expressa em São Paulo
+    const ENTREGA_ANALISE_PASSAGEM_AEREA = 5; //Criticidade da Análise do Pedido utilizado para Passagens Aéreas
+    const ENTREGA_ECONOMICA = 6; //Entrega Econômica
+    const ENTREGA_AGENDADA = 7; //Entrega Agendada
+    const ENTREGA_EMAIL = 8; //Entrega por e-mail
+    const ENTREGA_IMPRESSAO = 9; //Entrega via impressão
+    const ENTREGA_APLICATIVO = 10; //Entrega via aplicativo
+    const ENTREGA_CORREIO = 11; //Entrega física via correio
+    const ENTREGA_MOTOBOY = 12; //Entrega física via motoboy
+    const ENTREGA_BILHETERIA = 13; //Retirada na bilheteria
+    const ENTREGA_LOJA_PARCERIA = 14; //Retirada em loja parceira
+    const ENTREGA_CARTAO_CREDITO = 15; //Próprio cartão de crédito é o ingresso
+
+    private static $listShippingTypes = array(
+        self::ENTREGA_OUTROS,
+        self::ENTREGA_NORMAL,
+        self::ENTREGA_GARANTIDA,
+        self::ENTREGA_EXPRESSA_BRASIL,
+        self::ENTREGA_EXPRESSA_SAO_PAULO,
+        self::ENTREGA_ANALISE_PASSAGEM_AEREA,
+        self::ENTREGA_ECONOMICA,
+        self::ENTREGA_AGENDADA,
+        self::ENTREGA_EMAIL,
+        self::ENTREGA_IMPRESSAO,
+        self::ENTREGA_APLICATIVO,
+        self::ENTREGA_CORREIO,
+        self::ENTREGA_MOTOBOY,
+        self::ENTREGA_BILHETERIA,
+        self::ENTREGA_LOJA_PARCERIA,
+        self::ENTREGA_CARTAO_CREDITO
     );
 
-    const STATUS_NOVO = 0;
-    const STATUS_APROVADO = 9;
-    const STATUS_CANCELADO = 41;
-    const STATUS_REPROVADO = 45;
+    const STATUS_NOVO = 0; //Novo (Será Analisado pela ClearSale)
+    const STATUS_APROVADO = 9; //Aprovado (irá ao ClearSale já aprovado e não será analisado)
+    const STATUS_CANCELADO = 41; //Cancelado pelo Cliente (irá para ClearSale já cancelado e não será analisado)
+    const STATUS_REPROVADO = 45; //Reprovado (Irá para ClearSale já reprovado e não será analisado)
 
-    private static $statuses = array(
+    private static $listStatusTypes = array(
         self::STATUS_NOVO,
         self::STATUS_APROVADO,
         self::STATUS_CANCELADO,
-        self::STATUS_REPROVADO,
+        self::STATUS_REPROVADO
     );
 
-    const PRODUCT_A_CLEAR_SALE = 1;
-    const PRODUCT_M_CLEAR_SALE = 2;
-    const PRODUCT_T_CLEAR_SALE = 3;
-    const PRODUCT_TG_CLEAR_SALE = 4;
-    const PRODUCT_TH_CLEAR_SALE = 5;
-    const PRODUCT_TG_LIGHT_CLEAR_SALE = 6;
-    const PRODUCT_TG_FULL_CLEAR_SALE = 7;
-    const PRODUCT_T_MONITORADO = 8;
-    const PRODUCT_SCORE_DE_FRAUDE = 9;
-    const PRODUCT_CLEAR_ID = 10;
-    const PRODUCT_ANALISE_INTERNACIONAL = 11;
+    const TICKET_FULL = 12;
+    const TICKET_ONLINE_COM_CS = 13;
+    const TICKET_ONLINE_SEM_CS = 14;
+    const TICKET_ONLINE_SEM_QUIZ_COM_CS = 15;
+    const TICKET_ONLINE_SEM_QUIZ_SEM_CS = 16;
 
-    private static $products = array(
-        self::PRODUCT_A_CLEAR_SALE,
-        self::PRODUCT_M_CLEAR_SALE,
-        self::PRODUCT_T_CLEAR_SALE,
-        self::PRODUCT_TG_CLEAR_SALE,
-        self::PRODUCT_TH_CLEAR_SALE,
-        self::PRODUCT_TG_LIGHT_CLEAR_SALE,
-        self::PRODUCT_TG_FULL_CLEAR_SALE,
-        self::PRODUCT_T_MONITORADO,
-        self::PRODUCT_SCORE_DE_FRAUDE,
-        self::PRODUCT_CLEAR_ID,
-        self::PRODUCT_ANALISE_INTERNACIONAL,
+    private static $listProducts = array(
+        self::TICKET_FULL,
+        self::TICKET_ONLINE_COM_CS,
+        self::TICKET_ONLINE_SEM_CS,
+        self::TICKET_ONLINE_SEM_QUIZ_COM_CS,
+        self::TICKET_ONLINE_SEM_QUIZ_SEM_CS
     );
 
-    const LIST_TYPE_NAO_CADASTRADA = 1;
-    const LIST_TYPE_CHA_DE_BEBE = 2;
-    const LIST_TYPE_CASAMENTO = 3;
-    const LIST_TYPE_DESEJOS = 4;
-    const LIST_TYPE_ANIVERSARIO = 5;
-    const LIST_TYPE_CHA_BAR_OU_CHA_PANELA = 6;
-
-    private static $listTypes = array(
-        self::LIST_TYPE_NAO_CADASTRADA,
-        self::LIST_TYPE_CHA_DE_BEBE,
-        self::LIST_TYPE_CASAMENTO,
-        self::LIST_TYPE_DESEJOS,
-        self::LIST_TYPE_ANIVERSARIO,
-        self::LIST_TYPE_CHA_BAR_OU_CHA_PANELA,
-    );
-    private $fingerPrint;
     private $id;
+    private $fingerPrint;
     private $date;
     private $email;
-    private $ecommerceType;
     private $shippingPrice;
     private $totalItems;
     private $totalOrder;
-    private $quantityInstallments;
-    private $deliveryTime;
     private $quantityItems;
     private $quantityPaymentTypes;
     private $ip;
-    private $gift;
+    private $shippingType; //novo
     private $giftMessage;
-    private $notes;
+    private $obs;
     private $status;
-    private $reanalysis;
     private $origin;
-    private $reservationDate;
     private $country;
-    private $nationality;
     private $product;
-    private $listType;
-    private $listId;
     private $customerBillingData;
     private $customerShippingData;
     private $payments;
-    private $items;
-    private $passengers;
-    private $connections;
-    private $hotelReservations;
+    private $tickets;
 
     /**
-     * @param FingerPrint $fingerPrint
      * @param int $id
      * @param DateTime $date
      * @param string $email
      * @param float $totalItems
      * @param float $totalOrder
-     * @param int $quantityInstallments
      * @param string $ip
      * @param string $origin
      * @param CustomerBillingData $customerBillingData
      * @param CustomerShippingData $customerShippingData
      * @param Payment $payment
-     * @param Item $item
+     * @param Ticket $ticket
      * @return Order
      */
+
     public static function createEcommerceOrder(
         FingerPrint $fingerPrint,
         $id,
@@ -127,13 +117,13 @@ class Order
         $email,
         $totalItems,
         $totalOrder,
-        $quantityInstallments,
         $ip,
         $origin,
+        $product,
         CustomerBillingData $customerBillingData,
         CustomerShippingData $customerShippingData,
         Payment $payment,
-        Item $item
+        $tickets
     ) {
         return static::create(
             $fingerPrint,
@@ -142,70 +132,13 @@ class Order
             $email,
             $totalItems,
             $totalOrder,
-            $quantityInstallments,
             $ip,
             $origin,
+            $product,
             $customerBillingData,
             $customerShippingData,
             $payment,
-            $item
-        );
-    }
-
-    /**
-     * @param FingerPrint $fingerPrint
-     * @param int $id
-     * @param DateTime $date
-     * @param string $email
-     * @param float $totalItems
-     * @param float $totalOrder
-     * @param int $quantityInstallments
-     * @param string $ip
-     * @param string $origin
-     * @param CustomerBillingData $customerBillingData
-     * @param CustomerShippingData $customerShippingData
-     * @param Payment $payment
-     * @param Item $item
-     * @param Passenger $passenger
-     * @param Connection $connection
-     * @param HotelReservation $hotelReservation
-     * @return Order
-     */
-    public static function createAirlineTicketOrder(
-        FingerPrint $fingerPrint,
-        $id,
-        DateTime $date,
-        $email,
-        $totalItems,
-        $totalOrder,
-        $quantityInstallments,
-        $ip,
-        $origin,
-        CustomerBillingData $customerBillingData,
-        CustomerShippingData $customerShippingData,
-        Payment $payment,
-        Item $item,
-        Passenger $passenger = null,
-        Connection $connection = null,
-        HotelReservation $hotelReservation = null
-    ) {
-        return static::create(
-            $fingerPrint,
-            $id,
-            $date,
-            $email,
-            $totalItems,
-            $totalOrder,
-            $quantityInstallments,
-            $ip,
-            $origin,
-            $customerBillingData,
-            $customerShippingData,
-            $payment,
-            $item,
-            $passenger,
-            $connection,
-            $hotelReservation
+            $tickets
         );
     }
 
@@ -216,16 +149,13 @@ class Order
         $email,
         $totalItems,
         $totalOrder,
-        $quantityInstallments,
         $ip,
         $origin,
+        $product,
         CustomerBillingData $customerBillingData,
-        CustomerShippingData $shippingData,
+        CustomerShippingData $customerShippingData,
         Payment $payment,
-        Item $item,
-        Passenger $passenger = null,
-        Connection $connection = null,
-        HotelReservation $hotelReservation = null
+        $tickets
     ) {
         $instance = new self();
 
@@ -235,39 +165,14 @@ class Order
         $instance->setEmail($email);
         $instance->setTotalItems($totalItems);
         $instance->setTotalOrder($totalOrder);
-        $instance->setQuantityInstallments($quantityInstallments);
         $instance->setIp($ip);
         $instance->setOrigin($origin);
+        $instance->setProduct($product);
         $instance->setBillingData($customerBillingData);
-        $instance->setShippingData($shippingData);
+        $instance->setShippingData($customerShippingData);
         $instance->addPayment($payment);
-        $instance->addItem($item);
-
-        if (null !== $passenger) {
-            $instance->addPassenger($passenger);
-        }
-
-        if (null !== $connection) {
-            $instance->addConnection($connection);
-        }
-
-        if (null !== $hotelReservation) {
-            $instance->addHotelReservation($hotelReservation);
-        }
-
+        $instance->setTickets($tickets);
         return $instance;
-    }
-
-    public function getFingerPrint()
-    {
-        return $this->fingerPrint;
-    }
-
-    public function setFingerPrint(FingerPrint $fingerPrint)
-    {
-        $this->fingerPrint = $fingerPrint;
-
-        return $this;
     }
 
     public function getId()
@@ -278,6 +183,18 @@ class Order
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    public function getFingerPrint()
+    {
+        return $this->fingerPrint;
+    }
+
+    public function setFingerPrint(FingerPrint $fingerPrint)
+    {
+        $this->fingerPrint = $fingerPrint;
 
         return $this;
     }
@@ -311,22 +228,6 @@ class Order
     public function setEmail($email)
     {
         $this->email = $email;
-
-        return $this;
-    }
-
-    public function getEcommerceType()
-    {
-        return $this->ecommerceType;
-    }
-
-    public function setEcommerceType($ecommerceType)
-    {
-        if (!in_array($ecommerceType, self::$ecommerceTypes)) {
-            throw new InvalidArgumentException(sprintf('Invalid ecommerce type (%s)', $ecommerceType));
-        }
-
-        $this->ecommerceType = $ecommerceType;
 
         return $this;
     }
@@ -367,30 +268,6 @@ class Order
         return $this;
     }
 
-    public function getQuantityInstallments()
-    {
-        return $this->quantityInstallments;
-    }
-
-    public function setQuantityInstallments($quantityInstallments)
-    {
-        $this->quantityInstallments = $quantityInstallments;
-
-        return $this;
-    }
-
-    public function getDeliveryTime()
-    {
-        return $this->deliveryTime;
-    }
-
-    public function setDeliveryTime($deliveryTime)
-    {
-        $this->deliveryTime = $deliveryTime;
-
-        return $this;
-    }
-
     public function getQuantityItems()
     {
         return $this->quantityItems;
@@ -427,14 +304,14 @@ class Order
         return $this;
     }
 
-    public function getGift()
+    public function getShippingType()
     {
-        return $this->gift;
+        return $this->shippingType;
     }
 
-    public function setGift($gift)
+    public function setShippingType($shippingType)
     {
-        $this->gift = $gift;
+        $this->shippingType = $shippingType;
 
         return $this;
     }
@@ -451,14 +328,14 @@ class Order
         return $this;
     }
 
-    public function getNotes()
+    public function getObs()
     {
-        return $this->notes;
+        return $this->obs;
     }
 
-    public function setNotes($notes)
+    public function setObs($obs)
     {
-        $this->notes = $notes;
+        $this->obs = $obs;
 
         return $this;
     }
@@ -470,23 +347,11 @@ class Order
 
     public function setStatus($status)
     {
-        if (!in_array($status, self::$statuses)) {
+        if (!in_array($status, self::$listStatusTypes)) {
             throw new InvalidArgumentException(sprintf('Invalid status (%s)', $status));
         }
 
         $this->status = $status;
-
-        return $this;
-    }
-
-    public function getReanalysis()
-    {
-        return $this->reanalysis;
-    }
-
-    public function setReanalysis($reanalysis)
-    {
-        $this->reanalysis = $reanalysis;
 
         return $this;
     }
@@ -503,27 +368,6 @@ class Order
         return $this;
     }
 
-    /**
-     *
-     * @return DateTime
-     */
-    public function getReservationDate()
-    {
-        return $this->reservationDate;
-    }
-
-    /**
-     *
-     * @param DateTime $reservationDate
-     * @return Order
-     */
-    public function setReservationDate(DateTime $reservationDate)
-    {
-        $this->reservationDate = $reservationDate;
-
-        return $this;
-    }
-
     public function getCountry()
     {
         return $this->country;
@@ -536,18 +380,6 @@ class Order
         return $this;
     }
 
-    public function getNationality()
-    {
-        return $this->nationality;
-    }
-
-    public function setNationality($nationality)
-    {
-        $this->nationality = $nationality;
-
-        return $this;
-    }
-
     public function getProduct()
     {
         return $this->product;
@@ -555,39 +387,11 @@ class Order
 
     public function setProduct($product)
     {
-        if (!in_array($product, self::$products)) {
+        if (!in_array($product, self::$listProducts)) {
             throw new InvalidArgumentException(sprintf('Invalid product type (%s)', $product));
         }
 
         $this->product = $product;
-
-        return $this;
-    }
-
-    public function getListType()
-    {
-        return $this->listType;
-    }
-
-    public function setListType($listType)
-    {
-        if (!in_array($listType, self::$listTypes)) {
-            throw new InvalidArgumentException(sprintf('Invalid list type (%s)', $listType));
-        }
-
-        $this->listType = $listType;
-
-        return $this;
-    }
-
-    public function getListId()
-    {
-        return $this->listId;
-    }
-
-    public function setListId($listId)
-    {
-        $this->listId = $listId;
 
         return $this;
     }
@@ -681,22 +485,22 @@ class Order
 
     /**
      *
-     * @return Item[]
+     * @return Ticket[]
      */
-    public function getItems()
+    public function getTickets()
     {
         return $this->items;
     }
 
     /**
      *
-     * @param Item[] $items
+     * @param Ticket[] $tickets
      * @return Order
      */
-    public function setItems($items)
+    public function setTickets($tickets)
     {
-        foreach ($items as $item) {
-            $this->addItems($item);
+        foreach ($tickets as $ticket) {
+            $this->addTicket($ticket);
         }
 
         return $this;
@@ -704,105 +508,12 @@ class Order
 
     /**
      *
-     * @param Item $item
+     * @param Ticket $ticket
      * @return Order
      */
-    public function addItem(Item $item)
+    public function addTicket(Ticket $ticket)
     {
-        $this->items[] = $item;
-
-        return $this;
-    }
-
-    /**
-     *
-     * @return Passenger[]
-     */
-    public function getPassengers()
-    {
-        return $this->passengers;
-    }
-
-    /**
-     *
-     * @param Passenger[] $passengers
-     * @return Order
-     */
-    public function setPassengers($passengers)
-    {
-        foreach ($passengers as $passenger) {
-            $this->addPassenger($passenger);
-        }
-
-        return $this;
-    }
-
-    /**
-     *
-     * @param Passenger $passenger
-     * @return Order
-     */
-    public function addPassenger(Passenger $passenger)
-    {
-        $this->passengers[] = $passenger;
-        return $this;
-    }
-
-    /**
-     *
-     * @return Connection[]
-     */
-    public function getConnections()
-    {
-        return $this->connections;
-    }
-
-    /**
-     *
-     * @param Connection[] $connections
-     * @return Order
-     */
-    public function setConnections($connections)
-    {
-        foreach ($connections as $connection) {
-            $this->addConnection($connection);
-        }
-
-        return $this;
-    }
-
-    public function addConnection(Connection $connection)
-    {
-        $this->connections[] = $connection;
-        return $this;
-    }
-
-    /**
-     *
-     * @return HotelReservation[]
-     */
-    public function getHotelReservations()
-    {
-        return $this->hotelReservations;
-    }
-
-    /**
-     *
-     * @param HotelReservation[] $hotelReservations
-     * @return Order
-     */
-    public function setHotelReservations($hotelReservations)
-    {
-        foreach ($hotelReservations as $hotelReservation) {
-            $this->addHotelReservation($hotelReservation);
-        }
-        return $this;
-    }
-
-    public function addHotelReservation(HotelReservation $hotelReservation)
-    {
-        $this->hotelReservations[] = $hotelReservation;
-
+        $this->tickets[] = $ticket;
         return $this;
     }
 
@@ -816,16 +527,16 @@ class Order
         $xml->startElement("Orders");
         $xml->startElement("Order");
 
-        if ($this->fingerPrint) {
-            $this->fingerPrint->toXML($xml);
-        } else {
-            throw new RequiredFieldException('Field FingerPrint of the Order object is required');
-        }
-
         if ($this->id) {
             $xml->writeElement("ID", $this->id);
         } else {
             throw new RequiredFieldException('Field ID of the Order object is required');
+        }
+
+        if ($this->fingerPrint) {
+            $this->fingerPrint->toXML($xml);
+        } else {
+            throw new RequiredFieldException('Field FingerPrint of the Order object is required');
         }
 
         if ($this->date) {
@@ -838,10 +549,6 @@ class Order
             $xml->writeElement("Email", $this->email);
         } else {
             throw new RequiredFieldException('Field E-mail of the Order object is required');
-        }
-
-        if ($this->ecommerceType) {
-            $xml->writeElement("B2B_B2C", $this->ecommerceType);
         }
 
         if ($this->shippingPrice) {
@@ -860,16 +567,6 @@ class Order
             throw new RequiredFieldException('Field TotalOrder of the Order object is required');
         }
 
-        if ($this->quantityInstallments) {
-            $xml->writeElement("QtyInstallments", $this->quantityInstallments);
-        } else {
-            throw new RequiredFieldException('Field QtyInstallments of the Order object is required');
-        }
-
-        if ($this->deliveryTime) {
-            $xml->writeElement("DeliveryTimeCD", $this->deliveryTime);
-        }
-
         if ($this->quantityItems) {
             $xml->writeElement("QtyItems", $this->quantityItems);
         }
@@ -884,26 +581,20 @@ class Order
             throw new RequiredFieldException('Field IP of the Order object is required');
         }
 
-        // TODO: ShippingType not implemented
-
-        if ($this->gift) {
-            $xml->writeElement("Gift", $this->gift);
+        if ($this->shippingType) {
+            $xml->writeElement("ShippingType", $this->shippingType);
         }
 
         if ($this->giftMessage) {
             $xml->writeElement("GiftMessage", $this->giftMessage);
         }
 
-        if ($this->notes) {
-            $xml->writeElement("Obs", $this->notes);
+        if ($this->obs) {
+            $xml->writeElement("Obs", $this->obs);
         }
 
         if ($this->status) {
             $xml->writeElement("Status", $this->status);
-        }
-
-        if ($this->reanalysis) {
-            $xml->writeElement("Reanalise", $this->reanalysis);
         }
 
         if ($this->origin) {
@@ -912,36 +603,26 @@ class Order
             throw new RequiredFieldException('Field Origin of the Order object is required');
         }
 
-        if ($this->reservationDate) {
-            $xml->writeElement("ReservationDate", $this->reservationDate->format(Order::DATE_TIME_FORMAT));
-        }
-
         if ($this->country) {
             $xml->writeElement("Country", $this->country);
         }
 
-        if ($this->nationality) {
-            $xml->writeElement("Nationality", $this->nationality);
-        }
-
         if ($this->product) {
             $xml->writeElement("Product", $this->product);
-        }
-
-        if ($this->listType) {
-            $xml->writeElement("ListTypeID", $this->listType);
-        }
-
-        if ($this->listId) {
-            $xml->writeElement("ListID", $this->listId);
+        } else {
+            throw new RequiredFieldException('Field BillingData of the Order object is required');
         }
 
         if ($this->customerBillingData) {
             $this->customerBillingData->toXML($xml);
+        } else {
+            throw new RequiredFieldException('Field BillingData of the Order object is required');
         }
 
         if ($this->customerShippingData) {
             $this->customerShippingData->toXML($xml);
+        } else {
+            throw new RequiredFieldException('Field ShippingData of the Order object is required');
         }
 
         if (count($this->payments) > 0) {
@@ -952,46 +633,20 @@ class Order
             }
 
             $xml->endElement();
+        } else {
+            throw new RequiredFieldException('Field Payments of the Order object is required');
         }
 
-        if (count($this->items) > 0) {
-            $xml->startElement("Items");
+        if (count($this->tickets) > 0) {
+            $xml->startElement("Tickets");
 
-            foreach ($this->items as $item) {
-                $item->toXML($xml);
+            foreach ($this->tickets as $ticket) {
+                $ticket->toXML($xml);
             }
 
             $xml->endElement();
-        }
-
-        if (count($this->passengers) > 0) {
-            $xml->startElement("Passengers");
-
-            foreach ($this->passengers as $passenger) {
-                $passenger->toXML($xml);
-            }
-
-            $xml->endElement();
-        }
-
-        if (count($this->connections) > 0) {
-            $xml->startElement("Connections");
-
-            foreach ($this->connections as $connection) {
-                $connection->toXML($xml);
-            }
-
-            $xml->endElement();
-        }
-
-        if (count($this->hotelReservations) > 0) {
-            $xml->startElement("HotelReservations");
-
-            foreach ($this->hotelReservations as $hotelReservation) {
-                $hotelReservation->toXML($xml);
-            }
-
-            $xml->endElement();
+        } else {
+            throw new RequiredFieldException('Field Tickets of the Order object is required');
         }
 
         $xml->endElement(); // Order
